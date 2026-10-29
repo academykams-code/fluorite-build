@@ -25,6 +25,9 @@ jobs:
 
       - name: Compile Mach-O Dynamic Framework
         run: |
+          SOURCES=$(find src -name "*.cpp" -o -name "*.mm")
+          echo "Compiling sources:"
+          echo "$SOURCES"
           xcrun -sdk iphoneos clang++ \
             -target arm64-apple-ios14.0 \
             -std=c++17 \
@@ -42,23 +45,7 @@ jobs:
             -framework Security \
             -framework QuartzCore \
             -framework CoreGraphics \
-            src/loader_entry.cpp \
-            src/security/anti_tamper.cpp \
-            src/auth/remote_attestation.mm \
-            src/auth/import_manager.cpp \
-            src/engine/break_planner.cpp \
-            src/engine/menu_bot.cpp \
-            src/engine/pool_physics.cpp \
-            src/engine/script_engine.cpp \
-            src/engine/session_tracker.cpp \
-            src/engine/shot_solver.cpp \
-            src/engine/touch_calibrator.cpp \
-            src/rpc/game_rpc_handler.cpp \
-            src/interop/resolver.cpp \
-            src/loader/payload_loader.cpp \
-            src/ui/metal_context.mm \
-            src/ui/user_interface_view.mm \
-            src/ui/guest_picker.mm \
+            $SOURCES \
             -o build_output/libloader.framework/libloader
 
       - name: Create Framework Info.plist
@@ -88,8 +75,13 @@ jobs:
         run: |
           codesign -f -s - --timestamp=none build_output/libloader.framework
 
+      - name: Package Framework Zip
+        run: |
+          cd build_output
+          zip -r libloader.framework.zip libloader.framework
+
       - name: Upload Compiled Framework
         uses: actions/upload-artifact@v4
         with:
           name: libloader.framework
-          path: build_output/libloader.framework
+          path: build_output/libloader.framework.zip
