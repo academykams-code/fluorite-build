@@ -30,6 +30,7 @@ jobs:
           echo "$SOURCES"
           xcrun -sdk iphoneos clang++ \
             -target arm64-apple-ios14.0 \
+            -x objective-c++ \
             -std=c++17 \
             -stdlib=libc++ \
             -fobjc-arc \

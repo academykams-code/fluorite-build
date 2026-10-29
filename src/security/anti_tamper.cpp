@@ -78,9 +78,10 @@ void AntiTamper::InstallAdBlockHooks() {
     if (userInfoCls) {
         Method m = class_getInstanceMethod(userInfoCls, sel_registerName("isPayingUser"));
         if (m) {
-            method_setImplementation(m, imp_implementationWithBlock(^BOOL(id self) {
+            id block = (id)^BOOL(id self) {
                 return YES;
-            }));
+            };
+            method_setImplementation(m, imp_implementationWithBlock(block));
             printf("[AntiTamper] Hooked UserInfo.isPayingUser -> YES\n");
         }
     }
@@ -90,15 +91,17 @@ void AntiTamper::InstallAdBlockHooks() {
     if (adsManagerCls) {
         Method m1 = class_getInstanceMethod(adsManagerCls, sel_registerName("isReadyToShowInterstitial"));
         if (m1) {
-            method_setImplementation(m1, imp_implementationWithBlock(^BOOL(id self) {
+            id block1 = (id)^BOOL(id self) {
                 return NO;
-            }));
+            };
+            method_setImplementation(m1, imp_implementationWithBlock(block1));
         }
         Method m2 = class_getInstanceMethod(adsManagerCls, sel_registerName("areInterstitialsInitialised"));
         if (m2) {
-            method_setImplementation(m2, imp_implementationWithBlock(^BOOL(id self) {
+            id block2 = (id)^BOOL(id self) {
                 return NO;
-            }));
+            };
+            method_setImplementation(m2, imp_implementationWithBlock(block2));
         }
         printf("[AntiTamper] Hooked AdsManager interstitials -> Suppressed\n");
     }
