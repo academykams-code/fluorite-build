@@ -1,0 +1,7 @@
+.DS_Store
+*.o
+*.air
+*.metallib
+build/
+build_output/
+.vscode/

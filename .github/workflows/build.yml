@@ -1,0 +1,95 @@
+name: Build iOS libloader Framework
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Build Output Directories
+        run: |
+          mkdir -p build_output/libloader.framework
+
+      - name: Compile Metal Shaders
+        run: |
+          xcrun -sdk iphoneos metal -target air64-apple-ios14.0 -c shaders/imgui_shaders.metal -o imgui.air
+          xcrun -sdk iphoneos metal -target air64-apple-ios14.0 -c shaders/liquid_glass.metal -o glass.air
+          xcrun -sdk iphoneos metallib imgui.air glass.air -o build_output/libloader.framework/default.metallib
+
+      - name: Compile Mach-O Dynamic Framework
+        run: |
+          xcrun -sdk iphoneos clang++ \
+            -target arm64-apple-ios14.0 \
+            -std=c++17 \
+            -stdlib=libc++ \
+            -fobjc-arc \
+            -dynamiclib \
+            -O3 \
+            -Iinclude \
+            -Isrc \
+            -install_name @rpath/libloader.framework/libloader \
+            -framework Foundation \
+            -framework UIKit \
+            -framework Metal \
+            -framework MetalKit \
+            -framework Security \
+            -framework QuartzCore \
+            -framework CoreGraphics \
+            src/loader_entry.cpp \
+            src/security/anti_tamper.cpp \
+            src/auth/remote_attestation.mm \
+            src/auth/import_manager.cpp \
+            src/engine/break_planner.cpp \
+            src/engine/menu_bot.cpp \
+            src/engine/pool_physics.cpp \
+            src/engine/script_engine.cpp \
+            src/engine/session_tracker.cpp \
+            src/engine/shot_solver.cpp \
+            src/engine/touch_calibrator.cpp \
+            src/rpc/game_rpc_handler.cpp \
+            src/interop/resolver.cpp \
+            src/loader/payload_loader.cpp \
+            src/ui/metal_context.mm \
+            src/ui/user_interface_view.mm \
+            src/ui/guest_picker.mm \
+            -o build_output/libloader.framework/libloader
+
+      - name: Create Framework Info.plist
+        run: |
+          cat << 'EOF' > build_output/libloader.framework/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>libloader</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.appdome.libloader</string>
+              <key>CFBundlePackageType</key>
+              <string>FMWK</string>
+              <key>CFBundleShortVersionString</key>
+              <string>2.6.2</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>MinimumOSVersion</key>
+              <string>14.0</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Ad-Hoc Sign Framework
+        run: |
+          codesign -f -s - --timestamp=none build_output/libloader.framework
+
+      - name: Upload Compiled Framework
+        uses: actions/upload-artifact@v4
+        with:
+          name: libloader.framework
+          path: build_output/libloader.framework
