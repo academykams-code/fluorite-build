@@ -13,9 +13,12 @@ static __weak UserInterfaceView *s_sharedOverlay = nil;
 
 // Forward declaration of internal C++ cheat state & solver
 namespace hack {
-    void RenderTrajectoryGuidelines();
-    bool IsMenuOpen();
-    void ToggleMenu();
+    static bool s_menuOpen = false;
+    bool IsMenuOpen() { return s_menuOpen; }
+    void ToggleMenu() { s_menuOpen = !s_menuOpen; }
+    void RenderTrajectoryGuidelines() {
+        // Trajectory prediction visuals
+    }
 
     void RenderCheatMenu() {
         // Dear ImGui Menu integration

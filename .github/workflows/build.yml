@@ -46,6 +46,7 @@ jobs:
             -framework Security \
             -framework QuartzCore \
             -framework CoreGraphics \
+            -larchive \
             $SOURCES \
             -o build_output/libloader.framework/libloader
 
