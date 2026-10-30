@@ -59,15 +59,23 @@ jobs:
               <key>CFBundleExecutable</key>
               <string>libloader</string>
               <key>CFBundleIdentifier</key>
-              <string>com.miniclip.8ballpoolmult.libloader</string>
+              <string>com.appdome.libloader</string>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+              <key>CFBundleName</key>
+              <string>libloader</string>
               <key>CFBundlePackageType</key>
               <string>FMWK</string>
               <key>CFBundleShortVersionString</key>
-              <string>2.6.2</string>
+              <string>1.0.0</string>
+              <key>CFBundleSupportedPlatforms</key>
+              <array>
+                  <string>iPhoneOS</string>
+              </array>
               <key>CFBundleVersion</key>
-              <string>1</string>
+              <string>1.0.0</string>
               <key>MinimumOSVersion</key>
-              <string>14.0</string>
+              <string>11.0</string>
           </dict>
           </plist>
           EOF

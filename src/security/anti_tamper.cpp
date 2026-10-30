@@ -72,16 +72,25 @@ bool AntiTamper::DetectAnalysisTools() {
     return CheckFridaLoaded() || CheckSubstrateLoaded();
 }
 
+static BOOL Hook_isPayingUser(id self, SEL _cmd) {
+    return YES;
+}
+
+static BOOL Hook_isReadyToShowInterstitial(id self, SEL _cmd) {
+    return NO;
+}
+
+static BOOL Hook_areInterstitialsInitialised(id self, SEL _cmd) {
+    return NO;
+}
+
 void AntiTamper::InstallAdBlockHooks() {
     // 1. Hook UserInfo isPayingUser -> force return YES
     Class userInfoCls = objc_getClass("UserInfo");
     if (userInfoCls) {
         Method m = class_getInstanceMethod(userInfoCls, sel_registerName("isPayingUser"));
         if (m) {
-            id block = (id)^BOOL(id self) {
-                return YES;
-            };
-            method_setImplementation(m, imp_implementationWithBlock(block));
+            method_setImplementation(m, (IMP)Hook_isPayingUser);
             printf("[AntiTamper] Hooked UserInfo.isPayingUser -> YES\n");
         }
     }
@@ -91,17 +100,11 @@ void AntiTamper::InstallAdBlockHooks() {
     if (adsManagerCls) {
         Method m1 = class_getInstanceMethod(adsManagerCls, sel_registerName("isReadyToShowInterstitial"));
         if (m1) {
-            id block1 = (id)^BOOL(id self) {
-                return NO;
-            };
-            method_setImplementation(m1, imp_implementationWithBlock(block1));
+            method_setImplementation(m1, (IMP)Hook_isReadyToShowInterstitial);
         }
         Method m2 = class_getInstanceMethod(adsManagerCls, sel_registerName("areInterstitialsInitialised"));
         if (m2) {
-            id block2 = (id)^BOOL(id self) {
-                return NO;
-            };
-            method_setImplementation(m2, imp_implementationWithBlock(block2));
+            method_setImplementation(m2, (IMP)Hook_areInterstitialsInitialised);
         }
         printf("[AntiTamper] Hooked AdsManager interstitials -> Suppressed\n");
     }

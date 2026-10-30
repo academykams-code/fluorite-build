@@ -113,11 +113,19 @@ static void InitializeFluoriteFramework() {
 // Mach-O dynamic library initializer constructor attribute
 __attribute__((constructor))
 static void libloader_dylib_entry() {
-    // Safely observe application launch completion so UIKit and Cocos2d-x runtimes are fully setup
+    // 1. Observe application launch completion
     [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidFinishLaunchingNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
         InitializeFluoriteFramework();
     }];
+
+    // 2. Fallback: If notification was already sent or custom run loop is used, initialize after 2 seconds
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!g_initialized) {
+            printf("[Loader] Triggering initialization via fallback timer...\n");
+            InitializeFluoriteFramework();
+        }
+    });
 }
