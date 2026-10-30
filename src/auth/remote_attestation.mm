@@ -49,8 +49,25 @@ bool RemoteAttestation::Initialize(const std::string& fallbackKey) {
 }
 
 std::string RemoteAttestation::GetSavedLicenseKey() const {
+    // 1. Check persistent user defaults
     NSString *savedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kLicenseKeyPrefKey];
-    return savedKey ? [savedKey UTF8String] : "";
+    if (savedKey && savedKey.length > 0) {
+        return [savedKey UTF8String];
+    }
+
+    // 2. Check iOS system clipboard (matching original Fluorite behavior)
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    if (pasteboard && pasteboard.string) {
+        NSString *clipStr = [pasteboard.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (clipStr.length > 5) {
+            printf("[RemoteAttestation] Found license key on clipboard: %s\n", [clipStr UTF8String]);
+            [[NSUserDefaults standardUserDefaults] setObject:clipStr forKey:kLicenseKeyPrefKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            return [clipStr UTF8String];
+        }
+    }
+
+    return "";
 }
 
 void RemoteAttestation::SaveLicenseKey(const std::string& key) {

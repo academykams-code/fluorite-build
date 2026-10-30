@@ -64,6 +64,8 @@ namespace hack {
             _mtkView.sampleCount = 1;
             _mtkView.preferredFramesPerSecond = 60;
             _mtkView.userInteractionEnabled = NO; // Pass touches through to container view
+            _mtkView.paused = YES; // Stay paused until menu is activated
+            _mtkView.enableSetNeedsDisplay = YES;
             [self addSubview:_mtkView];
         }
 
@@ -79,6 +81,10 @@ namespace hack {
 
 - (void)onMenuGesture {
     _menuVisible = !_menuVisible;
+    _mtkView.paused = !_menuVisible;
+    if (_menuVisible) {
+        [_mtkView setNeedsDisplay];
+    }
     hack::ToggleMenu();
 
     // If opening menu while unlicensed, optionally prompt user to enter key

@@ -94,15 +94,19 @@ static void InitializeFluoriteFramework() {
         fluorite::RemoteAttestation::Instance().Initialize();
 
         // 7. Inject Metal UI overlay with a short delay to ensure root view controller is ready
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIWindow *keyWindow = GetActiveKeyWindow();
-            if (keyWindow && !g_overlayView) {
-                g_overlayView = [[UserInterfaceView alloc] init:keyWindow];
-                [keyWindow addSubview:g_overlayView];
-                [keyWindow bringSubviewToFront:g_overlayView];
-                printf("[UI] Successfully injected Metal UserInterfaceView into key window.\n");
-            } else {
-                printf("[UI] Key window not available yet or overlay already exists.\n");
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            @try {
+                UIWindow *keyWindow = GetActiveKeyWindow();
+                if (keyWindow && !g_overlayView) {
+                    g_overlayView = [[UserInterfaceView alloc] init:keyWindow];
+                    [keyWindow addSubview:g_overlayView];
+                    [keyWindow bringSubviewToFront:g_overlayView];
+                    printf("[UI] Successfully injected Metal UserInterfaceView into key window.\n");
+                } else {
+                    printf("[UI] Key window not available yet or overlay already exists.\n");
+                }
+            } @catch (NSException *ex) {
+                printf("[UI] Exception during overlay injection: %s\n", [ex.reason UTF8String]);
             }
         });
     } @catch (NSException *exception) {
