@@ -38,7 +38,7 @@ jobs:
             -O3 \
             -Iinclude \
             -Isrc \
-            -install_name @rpath/libloader.framework/libloader \
+            -install_name @executable_path/Frameworks/libloader.framework/libloader \
             -framework Foundation \
             -framework UIKit \
             -framework Metal \
@@ -46,7 +46,6 @@ jobs:
             -framework Security \
             -framework QuartzCore \
             -framework CoreGraphics \
-            -larchive \
             $SOURCES \
             -o build_output/libloader.framework/libloader
 
@@ -60,7 +59,7 @@ jobs:
               <key>CFBundleExecutable</key>
               <string>libloader</string>
               <key>CFBundleIdentifier</key>
-              <string>com.appdome.libloader</string>
+              <string>com.miniclip.8ballpoolmult.libloader</string>
               <key>CFBundlePackageType</key>
               <string>FMWK</string>
               <key>CFBundleShortVersionString</key>

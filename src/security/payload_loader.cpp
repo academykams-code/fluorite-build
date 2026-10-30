@@ -15,18 +15,18 @@ extern "C" {
     struct archive {};
     struct archive_entry {};
 
-    __attribute__((weak)) struct archive *archive_read_new(void) { return nullptr; }
-    __attribute__((weak)) int archive_read_support_filter_lz4(struct archive *) { return 0; }
-    __attribute__((weak)) int archive_read_support_format_tar(struct archive *) { return 0; }
-    __attribute__((weak)) int archive_read_open_filename(struct archive *, const char *, size_t) { return -1; }
-    __attribute__((weak)) int archive_read_next_header(struct archive *, struct archive_entry **) { return -1; }
-    __attribute__((weak)) const char *archive_entry_pathname(struct archive_entry *) { return ""; }
-    __attribute__((weak)) int64_t archive_entry_size(struct archive_entry *) { return 0; }
-    __attribute__((weak)) int archive_entry_filetype(struct archive_entry *) { return 0; }
-    __attribute__((weak)) int64_t archive_read_data(struct archive *, void *, size_t) { return 0; }
-    __attribute__((weak)) int archive_read_close(struct archive *) { return 0; }
-    __attribute__((weak)) int archive_read_free(struct archive *) { return 0; }
-    __attribute__((weak)) const char *archive_error_string(struct archive *) { return "archive not available"; }
+    struct archive *archive_read_new(void) { return nullptr; }
+    int archive_read_support_filter_lz4(struct archive *) { return 0; }
+    int archive_read_support_format_tar(struct archive *) { return 0; }
+    int archive_read_open_filename(struct archive *, const char *, size_t) { return -1; }
+    int archive_read_next_header(struct archive *, struct archive_entry **) { return -1; }
+    const char *archive_entry_pathname(struct archive_entry *) { return ""; }
+    int64_t archive_entry_size(struct archive_entry *) { return 0; }
+    int archive_entry_filetype(struct archive_entry *) { return 0; }
+    int64_t archive_read_data(struct archive *, void *, size_t) { return 0; }
+    int archive_read_close(struct archive *) { return 0; }
+    int archive_read_free(struct archive *) { return 0; }
+    const char *archive_error_string(struct archive *) { return "archive not available"; }
 }
 
 namespace loader {
